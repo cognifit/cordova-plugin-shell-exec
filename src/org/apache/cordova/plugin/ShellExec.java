@@ -13,40 +13,31 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
 public class ShellExec extends CordovaPlugin {
     @Override
     public boolean execute(String action, JSONArray data, final CallbackContext callbackContext) throws JSONException {
         if (action.equals("exec")) {
             final String cmd = data.getString(0);
-            //final String rootMode = data.getString(1);
+
             cordova.getThreadPool().execute(new Runnable() {
                 public void run() {
-                    Process p;
-                    StringBuffer output = new StringBuffer();
-                   // output.append("Cmd: "+cmd+"\nRoot Mode: "+rootMode+"\n");
+                    ProcessBuilder builder = new ProcessBuilder();
+                    builder.command("sh", "-c", cmd);
+                    builder.redirectErrorStream(true); // important so that errors don't overrun the process' buffer and make it fail
+
                     int exitStatus = -1;
+                    StringBuilder output = new StringBuilder();
+
                     try {
-                        p = Runtime.getRuntime().exec("sh");
-                        DataOutputStream outputStream = new DataOutputStream(p.getOutputStream());
+                        Process process = builder.start();
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
-                        outputStream.writeBytes(cmd + "\n");
-                        outputStream.flush();
-
-                        outputStream.writeBytes("exit\n");
-                        outputStream.flush();
-
-                        BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-                        BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
                         String line = "";
-
                         while ((line = reader.readLine()) != null) {
                             output.append(line + "\n");
                         }
-                        while ((line = stdError.readLine()) != null) {
-                            output.append(line);
-                        }
-                        exitStatus = p.waitFor();
+
+                        exitStatus = process.waitFor();
 
                     } catch (IOException e) {
                         output.append("IOException: " + e.getMessage() + "\n");
