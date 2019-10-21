@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<plugin id="org.apache.cordova.shell-exec" version="1.0.0" xmlns="http://apache.org/cordova/ns/plugins/1.0">
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    id="com.cognifit.cordova.nativehttprequest"
+    version="1.0.0">
+  <repo>https://github.com/cognifit/cordova-plugin-shell-exec.git</repo>
   <name>Exec</name>
   <description>Apache Cordova Execute Shell Command Plugin</description>
   <license>Apache 2.0</license>
